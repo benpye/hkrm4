@@ -13,8 +13,8 @@
       overlay = self: super: {
         ${name} = super.buildGoModule {
           inherit name src;
-          version = "2022-01-27";
-          vendorSha256 = "sha256-8mGrTvrJS16W8hvgpdewFNvTt+p4Tr0PgHZPKksmfZc=";
+          version = "2022-01-28";
+          vendorSha256 = "sha256-w5VEKWdY+kQyWEvKRZ6FovfzpwRW+zt2lFKylndvhU4=";
           subPackages = [ "cmd/hkrm4" ];
         };
       };
