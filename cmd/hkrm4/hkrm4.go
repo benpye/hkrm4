@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -49,7 +50,7 @@ var verbose *bool
 func newSensorCollector(bl *broadlink.Device) *sensorCollector {
 	return &sensorCollector{
 		bl:                bl,
-		humidityMetric:    prometheus.NewDesc("sensor_relative_humidity_percent", "Relative humidity in percent.", nil, nil),
+		humidityMetric:    prometheus.NewDesc("sensor_relative_humidity_percentage", "Relative humidity in percent.", nil, nil),
 		temperatureMetric: prometheus.NewDesc("sensor_temperature_celsius", "Temperature in degrees celsius.", nil, nil),
 	}
 }
@@ -141,7 +142,7 @@ func main() {
 		speed.SetStepValue(stepVal)
 
 		speedMetric := prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace:   "service",
+			Namespace:   "hkrm4",
 			Subsystem:   "fan",
 			Name:        "speed_fraction",
 			Help:        "Current fan speed.",
@@ -149,7 +150,7 @@ func main() {
 		})
 
 		lightMetric := prometheus.NewGauge(prometheus.GaugeOpts{
-			Namespace:   "service",
+			Namespace:   "hkrm4",
 			Subsystem:   "light",
 			Name:        "brightness_fraction",
 			Help:        "Current light brightness.",
@@ -163,7 +164,7 @@ func main() {
 				log.Printf("setting speed to %f (%d)", speed, step)
 			}
 
-			speedMetric.Set(speed)
+			speedMetric.Set(math.Min(speed/100.0, 1.0))
 
 			bl.SendData(config.Commands.Speed[step])
 
@@ -181,7 +182,7 @@ func main() {
 			}
 
 			if on {
-				setSpeed(speed.GetValue() / 100.0)
+				setSpeed(speed.GetValue())
 			} else {
 				setSpeed(0)
 			}
